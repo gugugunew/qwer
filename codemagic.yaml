@@ -5,16 +5,13 @@ workflows:
     environment:
       flutter: stable
     scripts:
-      # 先打印目录，确认路径（可保留，排查用）
-      - pwd
-      - ls
-      # 正确进入 aa 目录
+      # 1. 进入 aa 目录（你的项目根目录）
       - cd aa
-      - pwd
-      - ls
-      # 执行 Flutter 命令
+      # 2. 拉取依赖（核心步骤，之前就是这里目录不对报错）
       - flutter pub get
+      # 3. 编译 iOS 项目，不签名
       - flutter build ios --release --no-codesign
+      # 4. 在 aa 目录内生成 exportOptions.plist（避免路径混乱）
       - name: Create exportOptions.plist
         script: |
           cat > exportOptions.plist << EOF
@@ -29,6 +26,8 @@ workflows:
           </dict>
           </plist>
           EOF
+      # 5. 导出 IPA（路径完全适配 aa 目录内的编译产物）
       - xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive -exportOptionsPlist exportOptions.plist -exportPath build/ios/ipa
     artifacts:
+      # 6. 从 aa 目录内的产物路径下载 IPA
       - aa/build/ios/ipa/*.ipa
