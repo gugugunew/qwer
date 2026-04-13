@@ -1,7 +1,7 @@
 workflows:
   build-ios:
     name: Build iOS
-    instance_type: mac_mini
+    instance_type: mac_standard
     environment:
       flutter: stable
     scripts:
