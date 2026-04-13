@@ -5,14 +5,21 @@ workflows:
     environment:
       flutter: stable
     scripts:
+      # 先打印目录，确认路径（可保留，排查用）
+      - pwd
+      - ls
+      # 正确进入 aa 目录
       - cd aa
+      - pwd
+      - ls
+      # 执行 Flutter 命令
       - flutter pub get
       - flutter build ios --release --no-codesign
       - name: Create exportOptions.plist
         script: |
           cat > exportOptions.plist << EOF
           <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList1.0.dtd">
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
           <dict>
               <key>method</key>
@@ -22,6 +29,6 @@ workflows:
           </dict>
           </plist>
           EOF
-      - xcodebuild -exportArchive -archivePath aa/build/ios/archive/Runner.xcarchive -exportOptionsPlist exportOptions.plist -exportPath aa/build/ios/ipa
+      - xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive -exportOptionsPlist exportOptions.plist -exportPath build/ios/ipa
     artifacts:
       - aa/build/ios/ipa/*.ipa
